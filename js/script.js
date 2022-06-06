@@ -44,7 +44,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     //Timer
-    const deadline = '2022-05-30';                                  //время до которого должны дойти
+    const deadline = new Date()  /* '2022-05-30' */;                //время до которого должны дойти
+
+    deadline.setDate(deadline.getDate() + 1);                       // остается всегда 1 день
 
     function getTimeRemaining(endtime) {
         let days, hours, minutes, seconds;
@@ -117,16 +119,16 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
-        //let setModal = setTimeout(showModal, 5000 );              //модальное окно открывается через заданное время
+        //let setModal = setTimeout(showModal, 5000 );                     //модальное окно открывается через заданное время
 
-        function showModal() {                                      //вынесли повторяющийся код в отдельную функцию
+        function showModal() {                                             //вынесли повторяющийся код в отдельную функцию
             modal.classList.toggle("show");
-            document.body.style.overflow = 'hidden';                //отключаем прокрутку при открытом модальном окне
+            document.body.style.overflow = 'hidden';                       //отключаем прокрутку при открытом модальном окне
         }
 
-        function closeModal() {                                     //вынесли повторяющийся код в отдельную функцию
+        function closeModal() {                                            //вынесли повторяющийся код в отдельную функцию
             modal.classList.toggle("show");
-            document.body.style.overflow = '';                      // восстанавливаем функционал прокрутки при закрытии модального окна
+            document.body.style.overflow = '';                             // восстанавливаем функционал прокрутки при закрытии модального окна
         }
         
         modal.addEventListener('click', (e) => {
@@ -227,6 +229,64 @@ document.addEventListener('DOMContentLoaded', () => {
             'menu__item'
         );
         postCard.render();
+
+
+        //Forms 
+        const forms = document.querySelectorAll('form');
+
+        const messages = {                                                   //создаем обьект с различными сообщениями для пользователя
+            loading: 'Загрузка',
+            success: 'Спасибо! Скоро мы с Вами свяжемся',
+            failure: 'Что-то пошло не так...'
+        };
+
+        forms.forEach( item => {                                             //перебираем массив с формами
+            postData(item);                                                  //вызываем функцию postData на каждой форме 
+        }); 
+
+        function postData(form){
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                const statusMessage = document.createElement('div');         //динамически добавляем элемент
+                statusMessage.classList.add('status');                      
+                statusMessage.textContent = messages.loading;                //записываем в него сообщение из обьекта messages "Загрузка"
+                form.append(statusMessage);                                  //выгружаем в верстку в конец form
+
+                const request = new XMLHttpRequest();                        //с помощью конструктора создаем обьект 
+                request.open('POST', 'server.php');                          //собираем настройки для отправки
+               
+                request.setRequestHeader('Content-type', 'application/json; charset=utf-8');       //JSON// заголовок для формата JSON
+                const formData = new FormData(form);                         //создаем обект который собирает данные из формы, обязательно в верстке должны быть атрибуты name
+
+                //request.send(formData);                                      //отправляем сформированные данные
+
+                const object = {};                                           //JSON// при отправке в формате JSON необходимо formData преобразовать в обьект
+                formData.forEach((key, value) => {
+                    object[key] = value;
+                });
+
+                const json = JSON.stringify(object);                         //JSON// преобразовывам обьект в формат JSON
+
+                request.send(json);                                          //JSON// отправка данных JSON
+
+                
+
+                request.addEventListener('load', () => {
+                    if(request.status === 200) {
+                        console.log(request.response);
+                        statusMessage.textContent = messages.success;        //сообщение "Спасибо!"
+                        form.reset();                                        //очистили поля формы поле удачной отправки
+                        setTimeout( () => {                                  //удаляем сообщения об отправке через 2сек
+                            statusMessage.remove();
+                        }, 2000);
+                    } else {
+                        statusMessage.textContent = messages.failure;        //сообщение об ошибке
+                    }
+                });
+
+            });
+        }
 
 
 }); 

@@ -123,11 +123,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
         function showModal() {                                             //вынесли повторяющийся код в отдельную функцию
             modal.classList.toggle("show");
+            //modal.classList.add('show');
+            //modal.classList.remove('hide');
             document.body.style.overflow = 'hidden';                       //отключаем прокрутку при открытом модальном окне
         }
 
         function closeModal() {                                            //вынесли повторяющийся код в отдельную функцию
             modal.classList.toggle("show");
+            //modal.classList.add('hide');
+            //modal.classList.remove('show');
             document.body.style.overflow = '';                             // восстанавливаем функционал прокрутки при закрытии модального окна
         }
         
@@ -235,7 +239,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const forms = document.querySelectorAll('form');
 
         const messages = {                                                   //создаем обьект с различными сообщениями для пользователя
-            loading: 'Загрузка',
+            loading: 'img/form/spinner.svg',
             success: 'Спасибо! Скоро мы с Вами свяжемся',
             failure: 'Что-то пошло не так...'
         };
@@ -248,10 +252,13 @@ document.addEventListener('DOMContentLoaded', () => {
             form.addEventListener('submit', (e) => {
                 e.preventDefault();
                 
-                const statusMessage = document.createElement('div');         //динамически добавляем элемент
-                statusMessage.classList.add('status');                      
-                statusMessage.textContent = messages.loading;                //записываем в него сообщение из обьекта messages "Загрузка"
-                form.append(statusMessage);                                  //выгружаем в верстку в конец form
+                const statusMessage = document.createElement('img');         //динамически добавляем элемент
+                statusMessage.src = messages.loading;                        //путь к картинке
+                statusMessage.style.cssText = `                              
+                    display: block;
+                    margin: 0 auto;
+                `;               
+                form.insertAdjacentElement('afterend', statusMessage);       //выгружаем в верстку после form
 
                 const request = new XMLHttpRequest();                        //с помощью конструктора создаем обьект 
                 request.open('POST', 'server.php');                          //собираем настройки для отправки
@@ -270,23 +277,51 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 request.send(json);                                          //JSON// отправка данных JSON
 
-                
 
                 request.addEventListener('load', () => {
                     if(request.status === 200) {
                         console.log(request.response);
-                        statusMessage.textContent = messages.success;        //сообщение "Спасибо!"
+                        showThanksModal(messages.success);                   //сообщение "Спасибо!"
                         form.reset();                                        //очистили поля формы поле удачной отправки
-                        setTimeout( () => {                                  //удаляем сообщения об отправке через 2сек
+                        //setTimeout( () => {                                //удаляем сообщения об отправке через 2сек
                             statusMessage.remove();
-                        }, 2000);
+                        //}, 2000);
                     } else {
-                        statusMessage.textContent = messages.failure;        //сообщение об ошибке
+                        showThanksModal(messages.failure);                   //сообщение об ошибке
                     }
                 });
 
             });
         }
+
+        //красивое оповещение поле отправки формы
+        function showThanksModal(message) {
+            const prevModalDiolog = document.querySelector('.modal__dialog');
+
+            prevModalDiolog.classList.add('hide');                                   //скрываем основную форму с инпутами 
+            prevModalDiolog.classList.remove('show');
+            //showModal();
+
+            const thanksModal = document.createElement('div');                         
+            thanksModal.classList.add('modal__dialog');
+            thanksModal.innerHTML = `
+                <div class="modal__content">
+                    <form action="#">
+                        <div data-close class="modal__close">&times;</div>
+                        <div class="modal__title">${message}</div>
+                    </form>
+                </div>
+                `;
+            document.querySelector('.modal').append(thanksModal);
+
+            setTimeout( () => {                                                     
+                thanksModal.remove();                                                //удаляем форму благодарности
+                prevModalDiolog.classList.remove('hide');                            //восстанавливаем видимость основнойформы
+                prevModalDiolog.classList.add('show');
+                closeModal();                                                        //закрываем окно формы
+            }, 4000 );
+        }
+
 
 
 }); 

@@ -162,167 +162,170 @@ document.addEventListener('DOMContentLoaded', () => {
      
         
     //Card
-        class MenuCard {
-            constructor (src, alt, title, descr, price, parentSelector, ...classes) {      // rest-оператор в случае если будут добавляться классы
-                this.src = src;
-                this.alt = alt;
-                this.title = title;
-                this.descr = descr;
-                this.price = price;
-                this.classes = classes;
-                this.parent = document.querySelector(parentSelector);    //получаем место куда вствляем карту
-                this.transfer = 27;                                      //предпологаемый курс валют
-                this.changeToUAH();                                      //при  создании новой копии класса будет вызываться конвертор валют
-            }
-            changeToUAH() {
-                this.price = this.price * this.transfer;                 //метод по конвертации валюты в гривни
-            }
-            render() {
-                const element = document.createElement('div');           //добавляем div элемент и помещаем в него верстку карточки
+    class MenuCard {
+        constructor (src, alt, title, descr, price, parentSelector, ...classes) {      // rest-оператор в случае если будут добавляться классы
+            this.src = src;
+            this.alt = alt;
+            this.title = title;
+            this.descr = descr;
+            this.price = price;
+            this.classes = classes;
+            this.parent = document.querySelector(parentSelector);    //получаем место куда вствляем карту
+            this.transfer = 27;                                      //предпологаемый курс валют
+            this.changeToUAH();                                      //при  создании новой копии класса будет вызываться конвертор валют
+        }
+        changeToUAH() {
+            this.price = this.price * this.transfer;                 //метод по конвертации валюты в гривни
+        }
+        render() {
+            const element = document.createElement('div');           //добавляем div элемент и помещаем в него верстку карточки
 
-                if(this.classes.length === 0) {                          //если не передано ни одного класса, то присвоим по умолчанию 
-                    this.classes = 'menu__item';
-                    element.classList.add(this.classes);
-                } else {
-                    this.classes.forEach(className => element.classList.add(className)); //перебираем все добавленные классы и добавляем к element
-                }
+            if(this.classes.length === 0) {                          //если не передано ни одного класса, то присвоим по умолчанию 
+                this.classes = 'menu__item';
+                element.classList.add(this.classes);
+            } else {
+                this.classes.forEach(className => element.classList.add(className)); //перебираем все добавленные классы и добавляем к element
+            }
+
+            element.innerHTML = `
+                <img src= ${this.src} alt=${this.alt}>
+                <h3 class="menu__item-subtitle">${this.title}</h3>
+                <div class="menu__item-descr"> ${this.descr} </div>
+                <div class="menu__item-divider"></div>
+                <div class="menu__item-price">
+                <div class="menu__item-cost">Цена:</div>
+                <div class="menu__item-total"><span>${this.price}</span> грн/день</div>
+                </div>
+            `;
+            this.parent.append(element);                             //помещаем верстку(element) относительно динамического parent в HTML
+        }
+    }
+
+    const getResours = async (url) => {                              //создаем запрос который ополучает данные из сервер !!!УРОК № 90
+        const res = await fetch(url);
+
+        if(!res.ok){                                                //если статус запроса не окей(не 200)
+           throw new Error(`Could not fetch ${url}, status: ${res.status}`); // выкидывает в консоль ошибку с адресом и статусом ошибки
+        }
+
+        return await res.json();                                    //транформируем данные из json формата в обычный 
+    };
+
+    /* getResours('http://localhost:3000/menu')                        //запрс к серверу
+        .then(data => {                                                //получаем промис с обычным массивом обьектов
+            data.forEach( ({img, alting, title, descr, price}) => {    //через деструктуризацию передаем свойства полученного с сервера обьекта  
+                new MenuCard(img, alting, title, descr, price, '.menu .container').render();   //вызываем конструктор для карточек и вызываем метод по добавлению верстки
+            });
+        });
+ */
+        getResours('http://localhost:3000/menu')                       //постройка на лету если не нужна шаблонизация урок 90 в конце
+            .then(data => createCard(data));                           //получаем данные и вызываем функцию, передаем аргумент
+
+        function createCard(data) {
+            data.forEach(({img, alting, title, descr, price}) => {
+                const element =document.createElement('div');
+
+                element.classList.add('menu__item');
 
                 element.innerHTML = `
-                    <img src= ${this.src} alt=${this.alt}>
-                    <h3 class="menu__item-subtitle">${this.title}</h3>
-                    <div class="menu__item-descr"> ${this.descr} </div>
+                    <img src= ${img} alt=${alting}>
+                    <h3 class="menu__item-subtitle">${title}</h3>
+                    <div class="menu__item-descr"> ${descr} </div>
                     <div class="menu__item-divider"></div>
                     <div class="menu__item-price">
                     <div class="menu__item-cost">Цена:</div>
-                    <div class="menu__item-total"><span>${this.price}</span> грн/день</div>
+                    <div class="menu__item-total"><span>${price}</span> грн/день</div>
                     </div>
                 `;
-                this.parent.append(element);                             //помещаем верстку(element) относительно динамического parent в HTML
-            }
-        }
-
-        let fitnessCard = new MenuCard(                                  //новая кпия класса, передаем в нее аргумены
-            'img/tabs/vegy.jpg',
-            'vegy',
-            'Меню "Фитнес"',
-            'Меню "Фитнес" - это новый подход к приготовлению блюд: больше свежих овощей и фруктов. Продукт активных и здоровых людей. Это абсолютно новый продукт с оптимальной ценой и высоким качеством!',
-            9,                                    
-            '.menu .container',
-            'menu__item'
-        );
-        fitnessCard.render();                                            //вызываем метод render по добавлению верстки
-
-        let elitCard = new MenuCard(
-            'img/tabs/elite.jpg',
-            'elite',
-            'Меню “Премиум”',
-            'В меню “Премиум” мы используем не только красивый дизайн упаковки, но и качественное исполнение блюд. Красная рыба, морепродукты, фрукты - ресторанное меню без похода в ресторан!',
-            15,
-            '.menu .container',
-            'menu__item'
-        );
-        elitCard.render();
-
-        let postCard = new MenuCard(
-            'img/tabs/post.jpg',
-            'post',
-            'Меню "Постное"',
-            'Меню “Постное” - это тщательный подбор ингредиентов: полное отсутствие продуктов животного происхождения, молоко из миндаля, овса, кокоса или гречки, правильное количество белков за счет тофу и импортных вегетарианских стейков. ',
-            10,
-            '.menu .container',
-            'menu__item'
-        );
-        postCard.render();
-
-
-        //Forms 
-        const forms = document.querySelectorAll('form');
-
-        const messages = {                                                   //создаем обьект с различными сообщениями для пользователя
-            loading: 'img/form/spinner.svg',
-            success: 'Спасибо! Скоро мы с Вами свяжемся',
-            failure: 'Что-то пошло не так...'
-        };
-
-        forms.forEach( item => {                                             //перебираем массив с формами
-            postData(item);                                                  //вызываем функцию postData на каждой форме 
-        }); 
-
-        function postData(form){
-            form.addEventListener('submit', (e) => {
-                e.preventDefault();
-                
-                const statusMessage = document.createElement('img');         //динамически добавляем элемент
-                statusMessage.src = messages.loading;                        //путь к картинке
-                statusMessage.style.cssText = `                              
-                    display: block;
-                    margin: 0 auto;
-                `;               
-                form.insertAdjacentElement('afterend', statusMessage);       //выгружаем в верстку после form
-
-                const request = new XMLHttpRequest();                        //с помощью конструктора создаем обьект 
-                request.open('POST', 'server.php');                          //собираем настройки для отправки
-               
-                request.setRequestHeader('Content-type', 'application/json; charset=utf-8');       //JSON// заголовок для формата JSON
-                const formData = new FormData(form);                         //создаем обект который собирает данные из формы, обязательно в верстке должны быть атрибуты name
-
-                //request.send(formData);                                      //отправляем сформированные данные
-
-                const object = {};                                           //JSON// при отправке в формате JSON необходимо formData преобразовать в обьект
-                formData.forEach((key, value) => {
-                    object[key] = value;
-                });
-
-                const json = JSON.stringify(object);                         //JSON// преобразовывам обьект в формат JSON
-
-                request.send(json);                                          //JSON// отправка данных JSON
-
-
-                request.addEventListener('load', () => {
-                    if(request.status === 200) {
-                        console.log(request.response);
-                        showThanksModal(messages.success);                   //сообщение "Спасибо!"
-                        form.reset();                                        //очистили поля формы поле удачной отправки
-                        //setTimeout( () => {                                //удаляем сообщения об отправке через 2сек
-                            statusMessage.remove();
-                        //}, 2000);
-                    } else {
-                        showThanksModal(messages.failure);                   //сообщение об ошибке
-                    }
-                });
-
+                document.querySelector('.menu .container').append(element);
             });
+
         }
+    
 
-        //красивое оповещение поле отправки формы
-        function showThanksModal(message) {
-            const prevModalDiolog = document.querySelector('.modal__dialog');
+    //Form ///// Fetch API  /////////////////////////                    // -- через Fetch API
+    const forms = document.querySelectorAll('form');
 
-            prevModalDiolog.classList.add('hide');                                   //скрываем основную форму с инпутами 
-            prevModalDiolog.classList.remove('show');
-            //showModal();
+    const messages = {                                                   //создаем обьект с различными сообщениями для пользователя
+        loading: 'img/form/spinner.svg',
+        success: 'Спасибо! Скоро мы с Вами свяжемся',
+        failure: 'Что-то пошло не так...'
+    };
 
-            const thanksModal = document.createElement('div');                         
-            thanksModal.classList.add('modal__dialog');
-            thanksModal.innerHTML = `
-                <div class="modal__content">
-                    <form action="#">
-                        <div data-close class="modal__close">&times;</div>
-                        <div class="modal__title">${message}</div>
-                    </form>
-                </div>
-                `;
-            document.querySelector('.modal').append(thanksModal);
+    forms.forEach( item => {                                             //перебираем массив с формами
+        bindPostData(item);                                              //вызываем функцию postData на каждой форме 
+    }); 
 
-            setTimeout( () => {                                                     
-                thanksModal.remove();                                                //удаляем форму благодарности
-                prevModalDiolog.classList.remove('hide');                            //восстанавливаем видимость основнойформы
-                prevModalDiolog.classList.add('show');
-                closeModal();                                                        //закрываем окно формы
-            }, 4000 );
-        }
+    const postData = async (url, data) => {                              //создаем запрос которыйотправляет данные на сервер !!!УРОК № 90
+        const res = await fetch(url, {
+            method: 'POST',                                            
+            headers: {
+                'Content-type': 'application/json'                       //в заголовках между типом ставим : 
+            },
+            body: data   
+        });
+        return await res.json();
+    };
+
+    function bindPostData(form){
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const statusMessage = document.createElement('img');         //динамически добавляем элемент
+            statusMessage.src = messages.loading;                        //путь к картинке
+            statusMessage.style.cssText = `                              
+                display: block;
+                margin: 0 auto;
+            `;               
+            form.insertAdjacentElement('afterend', statusMessage);         //выгружаем в верстку после form
+
+            const formData = new FormData(form);                           //создаем обект который собирает данные из формы, обязательно в верстке должны быть атрибуты name
+
+            const json = JSON.stringify( Object.fromEntries( formData.entries() ) ); // превращаем массив обьектов в массив массивов => в обычный обьект => в json формат
+
+            postData('http://localhost:3000/requests', json)
+            .then(data => {                                                //при ответе
+                console.log(data);
+                showThanksModal(messages.success);
+                statusMessage.remove();
+
+            }).catch(() => {                                               //при ошибке
+                showThanksModal(messages.failure);
+
+            }).finally(() => {                                             //действие при любом ответе или ошибке
+                form.reset();   
+            });
+        });
+    } 
 
 
+    //красивое оповещение поле отправки формы
+    function showThanksModal(message) {
+        const prevModalDiolog = document.querySelector('.modal__dialog');
+
+        prevModalDiolog.classList.add('hide');                                   //скрываем основную форму с инпутами 
+        prevModalDiolog.classList.remove('show');
+        //showModal();
+
+        const thanksModal = document.createElement('div');                         
+        thanksModal.classList.add('modal__dialog');
+        thanksModal.innerHTML = `
+            <div class="modal__content">
+                <form action="#">
+                    <div data-close class="modal__close">&times;</div>
+                    <div class="modal__title">${message}</div>
+                </form>
+            </div>
+            `;
+        document.querySelector('.modal').append(thanksModal);
+
+        setTimeout( () => {                                                     
+            thanksModal.remove();                                                //удаляем форму благодарности
+            prevModalDiolog.classList.remove('hide');                            //восстанавливаем видимость основнойформы
+            prevModalDiolog.classList.add('show');
+            closeModal();                                                        //закрываем окно формы
+        }, 4000 );
+    }
 
 }); 
 

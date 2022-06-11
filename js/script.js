@@ -201,23 +201,24 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    const getResours = async (url) => {                              //создаем запрос который ополучает данные из сервер !!!УРОК № 90
+    const getResours = async (url) => {                              //создаем функцию по получению данных ссервера !!!УРОК № 90
         const res = await fetch(url);
 
         if(!res.ok){                                                //если статус запроса не окей(не 200)
            throw new Error(`Could not fetch ${url}, status: ${res.status}`); // выкидывает в консоль ошибку с адресом и статусом ошибки
         }
 
-        return await res.json();                                    //транформируем данные из json формата в обычный 
+        return await res.json();                                    //транформируем данные из json формата в обычный обьект
     };
 
     /* getResours('http://localhost:3000/menu')                        //запрс к серверу
         .then(data => {                                                //получаем промис с обычным массивом обьектов
-            data.forEach( ({img, alting, title, descr, price}) => {    //через деструктуризацию передаем свойства полученного с сервера обьекта  
+            data.forEach( ({img, alting, title, descr, price}) => {    //через деструктуризацию передаем свойства полученного с сервера обьекта
                 new MenuCard(img, alting, title, descr, price, '.menu .container').render();   //вызываем конструктор для карточек и вызываем метод по добавлению верстки
             });
         });
  */
+///////////////////////////////////////////////////// урок 90 в конце //////////////////////////////////////////////
         getResours('http://localhost:3000/menu')                       //постройка на лету если не нужна шаблонизация урок 90 в конце
             .then(data => createCard(data));                           //получаем данные и вызываем функцию, передаем аргумент
 
@@ -256,18 +257,18 @@ document.addEventListener('DOMContentLoaded', () => {
         bindPostData(item);                                              //вызываем функцию postData на каждой форме 
     }); 
 
-    const postData = async (url, data) => {                              //создаем запрос которыйотправляет данные на сервер !!!УРОК № 90
-        const res = await fetch(url, {
+    const postData = async (url, data) => {                              //создаем функцию по общению  с сервером, постинг данных !!!УРОК № 90
+        const res = await fetch(url, {                                   //настраиваем постинг данных json, ответ записываем в переменную res
             method: 'POST',                                            
             headers: {
                 'Content-type': 'application/json'                       //в заголовках между типом ставим : 
             },
             body: data   
         });
-        return await res.json();
+        return await res.json();        //получаем ответ о статусе прохождении постинга в виде промиса => конвертируем в обычный обьект => возвращаем из фунции  
     };
 
-    function bindPostData(form){
+    function bindPostData(form){                                         //фонкия отвечающая за привязку постинга данных на срвер
         form.addEventListener('submit', (e) => {
             e.preventDefault();
             
@@ -280,11 +281,11 @@ document.addEventListener('DOMContentLoaded', () => {
             form.insertAdjacentElement('afterend', statusMessage);         //выгружаем в верстку после form
 
             const formData = new FormData(form);                           //создаем обект который собирает данные из формы, обязательно в верстке должны быть атрибуты name
+            
+            const json = JSON.stringify( Object.fromEntries( formData.entries())  ); // превращаем массив обьектов в массив массивов => в обычный обьект => в json формат
 
-            const json = JSON.stringify( Object.fromEntries( formData.entries() ) ); // превращаем массив обьектов в массив массивов => в обычный обьект => в json формат
-
-            postData('http://localhost:3000/requests', json)
-            .then(data => {                                                //при ответе
+            postData('http://localhost:3000/requests', json)               //вызываем postData с передачей аргементов
+            .then(data => {                                                //получаем промис с ответом
                 console.log(data);
                 showThanksModal(messages.success);
                 statusMessage.remove();

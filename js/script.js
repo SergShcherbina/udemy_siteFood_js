@@ -197,35 +197,44 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="menu__item-total"><span>${this.price}</span> грн/день</div>
                 </div>
             `;
-            this.parent.append(element);                             //помещаем верстку(element) относительно динамического parent в HTML
+            this.parent.append(element);                               //помещаем верстку(element) относительно динамического parent в HTML
         }
     }
 
-    const getResours = async (url) => {                              //создаем функцию по получению данных ссервера !!!УРОК № 90
+    const getResours = async (url) => {                                //создаем функцию по получению данных ссервера !!!УРОК № 90
         const res = await fetch(url);
 
-        if(!res.ok){                                                //если статус запроса не окей(не 200)
+        if(!res.ok){                                                         //если статус запроса не окей(не 200)
            throw new Error(`Could not fetch ${url}, status: ${res.status}`); // выкидывает в консоль ошибку с адресом и статусом ошибки
         }
 
-        return await res.json();                                    //транформируем данные из json формата в обычный обьект
+        return await res.json();                                       //транформируем данные из json формата в обычный обьект
     };
 
-    /* getResours('http://localhost:3000/menu')                        //запрс к серверу
+    /* axios.get('http://localhost:3000/menu')                         //сделать запрос с помощью библиотеки axix, ф-я getResours не нужна !урок 91
+        .then(data => {                                                
+            data.data.forEach( ({img, alting, title, descr, price}) => {    
+                new MenuCard(img, alting, title, descr, price, '.menu .container').render();   
+            });
+        }); */
+
+
+    getResours('http://localhost:3000/menu')                           //запрс к серверу
         .then(data => {                                                //получаем промис с обычным массивом обьектов
             data.forEach( ({img, alting, title, descr, price}) => {    //через деструктуризацию передаем свойства полученного с сервера обьекта
                 new MenuCard(img, alting, title, descr, price, '.menu .container').render();   //вызываем конструктор для карточек и вызываем метод по добавлению верстки
             });
         });
- */
-///////////////////////////////////////////////////// урок 90 в конце //////////////////////////////////////////////
-        getResours('http://localhost:3000/menu')                       //постройка на лету если не нужна шаблонизация урок 90 в конце
-            .then(data => createCard(data));                           //получаем данные и вызываем функцию, передаем аргумент
+
+//////////////////////////////////////////// урок 90 в конце постройка на лету////////////////////////////////
+
+        /* getResours('http://localhost:3000/menu')                     //постройка на лету если не нужна шаблонизация урок 90 в конце
+            .then(data => createCard(data));                            //получаем данные и вызываем функцию, передаем аргумент
 
         function createCard(data) {
             data.forEach(({img, alting, title, descr, price}) => {
                 const element =document.createElement('div');
-
+  
                 element.classList.add('menu__item');
 
                 element.innerHTML = `
@@ -241,39 +250,39 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.querySelector('.menu .container').append(element);
             });
 
-        }
+        } */
     
 
-    //Form ///// Fetch API  /////////////////////////                    // -- через Fetch API
+    //Form ///// Fetch API  /////////////////////////                      // -- через Fetch API
     const forms = document.querySelectorAll('form');
 
-    const messages = {                                                   //создаем обьект с различными сообщениями для пользователя
+    const messages = {                                                     //создаем обьект с различными сообщениями для пользователя
         loading: 'img/form/spinner.svg',
         success: 'Спасибо! Скоро мы с Вами свяжемся',
         failure: 'Что-то пошло не так...'
     };
 
-    forms.forEach( item => {                                             //перебираем массив с формами
-        bindPostData(item);                                              //вызываем функцию postData на каждой форме 
+    forms.forEach( item => {                                               //перебираем массив с формами
+        bindPostData(item);                                                //вызываем функцию postData на каждой форме 
     }); 
 
-    const postData = async (url, data) => {                              //создаем функцию по общению  с сервером, постинг данных !!!УРОК № 90
-        const res = await fetch(url, {                                   //настраиваем постинг данных json, ответ записываем в переменную res
+    const postData = async (url, data) => {                                //создаем функцию по общению  с сервером, постинг данных !!!УРОК № 90
+        const res = await fetch(url, {                                     //настраиваем постинг данных json, ответ записываем в переменную res
             method: 'POST',                                            
             headers: {
-                'Content-type': 'application/json'                       //в заголовках между типом ставим : 
+                'Content-type': 'application/json'                         //в заголовках между типом ставим : 
             },
             body: data   
         });
         return await res.json();        //получаем ответ о статусе прохождении постинга в виде промиса => конвертируем в обычный обьект => возвращаем из фунции  
     };
 
-    function bindPostData(form){                                         //фонкия отвечающая за привязку постинга данных на срвер
+    function bindPostData(form){                                           //фонкия отвечающая за привязку постинга данных на срвер
         form.addEventListener('submit', (e) => {
             e.preventDefault();
-            
-            const statusMessage = document.createElement('img');         //динамически добавляем элемент
-            statusMessage.src = messages.loading;                        //путь к картинке
+              
+            const statusMessage = document.createElement('img');           //динамически добавляем элемент
+            statusMessage.src = messages.loading;                          //путь к картинке
             statusMessage.style.cssText = `                              
                 display: block;
                 margin: 0 auto;
@@ -327,6 +336,44 @@ document.addEventListener('DOMContentLoaded', () => {
             closeModal();                                                        //закрываем окно формы
         }, 4000 );
     }
+    
+
+    // Slider --- простой слайдер урок №92
+    const slides = document.querySelectorAll('.offer__slide'),
+          currentSlide = document.getElementById('current'),
+          totalSlide = document.getElementById('total'),
+          next = document.querySelector('.offer__slider-next'),
+          prev = document.querySelector('.offer__slider-prev');
+
+    let slideIndex = 1;                                                          //задаем индекс для текущегослайда
+    showSlides(slideIndex);                                                      //инициализация слайда
+
+    next.addEventListener('click', e => {                                        
+        showSlides(slideIndex += 1);                                             //при нажатии увеличиваем индекс на 1
+        });
+
+    prev.addEventListener('click', e => {
+        showSlides(slideIndex -= 1);                                         
+    });
+
+    function showSlides(n){
+
+        slides.forEach((e) => {
+            e.classList.add('hide');                                             //с помощью цкла скрываем все слайды
+        });
+       
+        if(n > slides.length){                                                   //условие в случае когда слайды законатся перекинуть на первый
+            slideIndex = 1;
+        }
+        if(n < 1){                                                               // в случае листинга в обратную сторону перекинуть на последний
+            slideIndex = slides.length;
+        }
+
+        slides[slideIndex - 1].classList.toggle('hide');                         //показываем слайд с нулевым индексом(первый)
+
+        currentSlide.textContent = getZiro(`${slideIndex}`);                     //в нумерацию слайдов прописываем индекс и ставим ноль перед цифрой
+        totalSlide.textContent = getZiro(slides.length);                         //показываем общее количесво слайдов в нумерации
+    }                                                                            //!при выводе нумерации нельзя slideIndex заменить на аргумент n
 
 }); 
 

@@ -338,14 +338,87 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
 
-    // Slider --- простой слайдер урок №92
+    // Slider --- простой слайдер урок №92 / слайдер с горизонтальной прокруткой №93
     const slides = document.querySelectorAll('.offer__slide'),
           currentSlide = document.getElementById('current'),
           totalSlide = document.getElementById('total'),
           next = document.querySelector('.offer__slider-next'),
-          prev = document.querySelector('.offer__slider-prev');
+          prev = document.querySelector('.offer__slider-prev'),
+          slideWrapper = document.querySelector('.offer__slider-wrapper'),
+          slideField = document.querySelector('.offer__slider-inner'),
+          width = window.getComputedStyle(slideWrapper).width;                   //93 получаем ширину переменной slideWrapper из применненных к ней стилей
 
-    let slideIndex = 1;                                                          //задаем индекс для текущегослайда
+        let slideIndex = 1;                                                      //93 задаем индекс для текущегослайда
+        let offset = 0;                                                          //93 переменная для контроля отступаб так как слайдер горизонтальный
+    
+        if(slides.length < 10) {
+            totalSlide.textContent = `0${slides.length}`; 
+            currentSlide.textContent =`0${slideIndex}`
+        } else {
+            totalSlide.textContent = slides.length;
+            currentSlide.textContent = slideIndex;
+        }
+       
+
+        slideField.style.width = 100 * slides.length + '%';                      //93 задаем ширину всего поля слайдера в ширину в %
+        slideField.style.display = 'flex';                                       //93 чтобы слайды выстроились по горизонтали
+        slideField.style.transition = '0.5s all';                                //93 плавность переключения
+        slideWrapper.style.overflow = 'hidden';                                  //93 скрываем все за пределами основной обертки слайдера
+
+        slides.forEach(slide => {  
+                                                         
+            slide.style.width = width;                                           //задаем каждому сайду из массива ширину width
+        });
+
+
+        next.addEventListener('click', () => {
+            if(offset == +width.slice(0, width.length-2) * (slides.length - 1)){        //93 если отступ(offset) == ширина слайда * кол-во сл -1 
+                offset = 0;                                                           //93 то возвращаем к первому слайду, отступ = 0
+            } else {
+                offset += +width.slice(0, width.length-2);                       //93 slice вырезает две буквы 'px' из приходяцей width
+            }
+            
+            slideField.style.transform = `translateX(-${offset}px)`;
+
+            if(slideIndex == slides.length) {
+                slideIndex = 1;
+            }else {
+                slideIndex ++;
+            }
+
+            if(slides.length < 10) {
+                currentSlide.textContent = `0${slideIndex}`;
+            } else {
+                currentSlide.textContent = slideIndex;
+            }
+
+        });
+
+        prev.addEventListener('click', () => {
+            if(offset == 0) {        
+                offset = +width.slice(0, width.length-2) * (slides.length - 1);
+            } else {
+                offset -= +width.slice(0, width.length-2);                       
+            }
+            
+            slideField.style.transform = `translateX(-${offset}px)`;
+
+            if(slideIndex == 1) {
+                slideIndex = slides.length;
+            }else {
+                slideIndex --;
+            }
+
+            if(slides.length < 10) {
+                currentSlide.textContent = `0${slideIndex}`;
+            } else {
+                currentSlide.textContent = slideIndex;
+            }
+        });
+        
+
+
+  /*   let slideIndex = 1;                                                          //задаем индекс для текущегослайда
     showSlides(slideIndex);                                                      //инициализация слайда
 
     next.addEventListener('click', e => {                                        
@@ -373,7 +446,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         currentSlide.textContent = getZiro(`${slideIndex}`);                     //в нумерацию слайдов прописываем индекс и ставим ноль перед цифрой
         totalSlide.textContent = getZiro(slides.length);                         //показываем общее количесво слайдов в нумерации
-    }                                                                            //!при выводе нумерации нельзя slideIndex заменить на аргумент n
+    }  */                                                                           //!при выводе нумерации нельзя slideIndex заменить на аргумент n
 
 }); 
 

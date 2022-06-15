@@ -340,6 +340,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Slider --- простой слайдер урок №92 / слайдер с горизонтальной прокруткой №93
     const slides = document.querySelectorAll('.offer__slide'),
+          slider = document.querySelector('.offer__slider'),                     //94 получаем весь слайдер 
           currentSlide = document.getElementById('current'),
           totalSlide = document.getElementById('total'),
           next = document.querySelector('.offer__slider-next'),
@@ -351,51 +352,68 @@ document.addEventListener('DOMContentLoaded', () => {
         let slideIndex = 1;                                                      //93 задаем индекс для текущегослайда
         let offset = 0;                                                          //93 переменная для контроля отступаб так как слайдер горизонтальный
     
-        if(slides.length < 10) {
-            totalSlide.textContent = `0${slides.length}`; 
-            currentSlide.textContent =`0${slideIndex}`
-        } else {
-            totalSlide.textContent = slides.length;
-            currentSlide.textContent = slideIndex;
-        }
-       
+        //инициализация слайдера       
+        currentSlide.textContent = getZiro(`${slideIndex}`);                     //93 в нумерацию слайдов прописываем индекс и ставим ноль перед цифрой
+        totalSlide.textContent = getZiro(slides.length);                         //93 показываем общее количесво слайдов в нумерации
+
 
         slideField.style.width = 100 * slides.length + '%';                      //93 задаем ширину всего поля слайдера в ширину в %
         slideField.style.display = 'flex';                                       //93 чтобы слайды выстроились по горизонтали
         slideField.style.transition = '0.5s all';                                //93 плавность переключения
         slideWrapper.style.overflow = 'hidden';                                  //93 скрываем все за пределами основной обертки слайдера
+        
 
         slides.forEach(slide => {  
                                                          
-            slide.style.width = width;                                           //задаем каждому сайду из массива ширину width
+            slide.style.width = width;                                           //93 задаем каждому сайду из массива ширину равную width
         });
 
+        slider.style.position = 'relative';                                      //94 для позицианирования дотсов
+
+        const indicators = document.createElement('ol');                         //94 добавляем ордерлист для дотсов
+        let dots = [];                                                           //94 создаем массив для дотсов
+
+        indicators.classList.add('carousel-indicators');                         //94 применяем к нему класс из css
+        slider.append(indicators);
+
+        for(let i = 0; i < slides.length; i++){                                  //94 цикл по созданию дотсов 
+            let dot = document.createElement('li');
+            dot.classList.add('dot');
+            dot.setAttribute('data-slide-to', i + 1);                            //94 каждому дотсу добавляем атрибук
+
+            if(i == 0) {                                                         //94 если первый слайдер, то и первый дотс с прозрачностью 1
+                dot.style.opacity = 1;
+            }
+
+            indicators.append(dot);                                              //94 апендим в indicators
+            dots.push(dot);                                                      //94 пушим дотсы в массив
+        }
 
         next.addEventListener('click', () => {
-            if(offset == +width.slice(0, width.length-2) * (slides.length - 1)){        //93 если отступ(offset) == ширина слайда * кол-во сл -1 
-                offset = 0;                                                           //93 то возвращаем к первому слайду, отступ = 0
+            if(offset == +width.slice(0, width.length-2) * (slides.length - 1)){    //93 если отступ(offset) == ширина слайда * кол-во сл -1 
+                offset = 0;                                                         //93 то возвращаем к первому слайду, отступ = 0
             } else {
-                offset += +width.slice(0, width.length-2);                       //93 slice вырезает две буквы 'px' из приходяцей width
+                offset += +width.slice(0, width.length-2);                          //93 slice вырезает две буквы 'px' из приходяцей width
             }
             
-            slideField.style.transform = `translateX(-${offset}px)`;
+            slideField.style.transform = `translateX(-${offset}px)`;                //93 перемещаем влево на ширину offset
 
-            if(slideIndex == slides.length) {
+            if(slideIndex == slides.length) {                                       //93 условие по отображению номера(индекса) слайда
                 slideIndex = 1;
             }else {
                 slideIndex ++;
             }
 
-            if(slides.length < 10) {
-                currentSlide.textContent = `0${slideIndex}`;
-            } else {
-                currentSlide.textContent = slideIndex;
-            }
+            currentSlide.textContent = getZiro(`${slideIndex}`);                     //в нумерацию слайдов прописываем индекс и ставим ноль перед цифрой
+            totalSlide.textContent = getZiro(slides.length);                         //показываем общее количесво слайдов в нумерации
+
+            dots.forEach(dot => dot.style.opacity = '0.5');                          //94 всем дотсам прозрачность 50%
+            dots[slideIndex - 1].style.opacity = 1;                                  //94 дотс с нужным индексом прозрачность 1
 
         });
 
-        prev.addEventListener('click', () => {
-            if(offset == 0) {        
+        prev.addEventListener('click', () => {                                       //93 все тоже только в обратную сторону
+            if(offset == 0) {         
                 offset = +width.slice(0, width.length-2) * (slides.length - 1);
             } else {
                 offset -= +width.slice(0, width.length-2);                       
@@ -409,45 +427,31 @@ document.addEventListener('DOMContentLoaded', () => {
                 slideIndex --;
             }
 
-            if(slides.length < 10) {
-                currentSlide.textContent = `0${slideIndex}`;
-            } else {
-                currentSlide.textContent = slideIndex;
-            }
+            currentSlide.textContent = getZiro(`${slideIndex}`);                     //в нумерацию слайдов прописываем индекс и ставим ноль перед цифрой
+            totalSlide.textContent = getZiro(slides.length);                         //показываем общее количесво слайдов в нумерации
+
+            dots.forEach(dot => dot.style.opacity = '0.5');                          //94 всем дотсам прозрачность 50%
+            dots[slideIndex - 1].style.opacity = 1;                                  //94 дотс с нужным индексом прозрачность 1
         });
         
+        dots.forEach( dot => {
+            dot.addEventListener('click', (e) => {
+                const slideTo = e.target.getAttribute('data-slide-to');              //94 записываем в переменную номер дотса на котор. событие 
 
+                slideIndex = slideTo;                                                //94 меняем индек относительно номера дотса(slideTo)
+                offset = +width.slice(0, width.length-2) * (slideTo - 1);            //94 отступ относительно slideTo
 
-  /*   let slideIndex = 1;                                                          //задаем индекс для текущегослайда
-    showSlides(slideIndex);                                                      //инициализация слайда
+                slideField.style.transform = `translateX(-${offset}px)`;             //94 перемещаем слайд на новый отсуп
 
-    next.addEventListener('click', e => {                                        
-        showSlides(slideIndex += 1);                                             //при нажатии увеличиваем индекс на 1
+                currentSlide.textContent = getZiro(`${slideIndex}`);                 //в нумерацию слайдов прописываем индекс и ставим ноль перед цифрой
+                totalSlide.textContent = getZiro(slides.length);                     //показываем общее количесво слайдов в нумерации
+
+                dots.forEach(dot => dot.style.opacity = '0.5');                      //94 всем дотсам прозрачность 50%
+                dots[slideIndex - 1].style.opacity = 1;                              //94 дотс с нужным индексом прозрачность 1
+            });
         });
 
-    prev.addEventListener('click', e => {
-        showSlides(slideIndex -= 1);                                         
-    });
-
-    function showSlides(n){
-
-        slides.forEach((e) => {
-            e.classList.add('hide');                                             //с помощью цкла скрываем все слайды
-        });
-       
-        if(n > slides.length){                                                   //условие в случае когда слайды законатся перекинуть на первый
-            slideIndex = 1;
-        }
-        if(n < 1){                                                               // в случае листинга в обратную сторону перекинуть на последний
-            slideIndex = slides.length;
-        }
-
-        slides[slideIndex - 1].classList.toggle('hide');                         //показываем слайд с нулевым индексом(первый)
-
-        currentSlide.textContent = getZiro(`${slideIndex}`);                     //в нумерацию слайдов прописываем индекс и ставим ноль перед цифрой
-        totalSlide.textContent = getZiro(slides.length);                         //показываем общее количесво слайдов в нумерации
-    }  */                                                                           //!при выводе нумерации нельзя slideIndex заменить на аргумент n
-
+        
 }); 
 
 

@@ -389,11 +389,16 @@ document.addEventListener('DOMContentLoaded', () => {
             dots.push(dot);                                                      //94 пушим дотсы в массив
         }
 
+        function stringToNumber (str) {                                           //96 убирает все буквы и приводит к числовому значению
+            return +str.replace(/\D/g, '');
+        }
+
         next.addEventListener('click', () => {
-            if(offset == +width.slice(0, width.length-2) * (slides.length - 1)){    //93 если отступ(offset) == ширина слайда * кол-во сл -1 
+            //if(offset == +width.slice(0, width.length-2) * (slides.length - 1)){  //93 если отступ(offset) == ширина слайда * кол-во сл -1 
+            if(offset == stringToNumber(width) * (slides.length - 1)){              //96 тоже что и на верхней, только НЕ числа заменяем на ''
                 offset = 0;                                                         //93 то возвращаем к первому слайду, отступ = 0
             } else {
-                offset += +width.slice(0, width.length-2);                          //93 slice вырезает две буквы 'px' из приходяцей width
+                offset += stringToNumber(width);                                    //93 slice вырезает две буквы 'px' из приходяцей width
             }
             
             slideField.style.transform = `translateX(-${offset}px)`;                //93 перемещаем влево на ширину offset
@@ -414,9 +419,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         prev.addEventListener('click', () => {                                       //93 все тоже только в обратную сторону
             if(offset == 0) {         
-                offset = +width.slice(0, width.length-2) * (slides.length - 1);
+                offset = stringToNumber(width) * (slides.length - 1);
             } else {
-                offset -= +width.slice(0, width.length-2);                       
+                offset -= stringToNumber(width);                       
             }
             
             slideField.style.transform = `translateX(-${offset}px)`;
@@ -439,7 +444,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const slideTo = e.target.getAttribute('data-slide-to');              //94 записываем в переменную номер дотса на котор. событие 
 
                 slideIndex = slideTo;                                                //94 меняем индек относительно номера дотса(slideTo)
-                offset = +width.slice(0, width.length-2) * (slideTo - 1);            //94 отступ относительно slideTo
+                offset = stringToNumber(width) * (slideTo - 1);                      //94 отступ относительно slideTo
 
                 slideField.style.transform = `translateX(-${offset}px)`;             //94 перемещаем слайд на новый отсуп
 

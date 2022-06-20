@@ -456,7 +456,78 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
-        
+    //№97 Calc
+    const result = document.querySelector('.calculating__result span');              //элемент куда записываем результат
+
+    let sex = 'female',
+    height, weight, age,
+    ratio = 1.375;
+
+    function calcTotal() {                                                           //занимается подсчетами
+        if (!sex || !height || !weight || !age || !ratio) {                          //если хоть одно из полей не заполнено
+            result.textContent = '____';                                             //подсчеты не производятсяб записываем ____
+            return;                                                                  //и прирываем функцию
+        }
+
+        if(sex === 'famale'){                                                        //если пол женский 
+            result.textContent = Math.round((447.6 + (9.2 * weight) + (3.1 * height) - (4.3 * age)) * ratio);
+        } else {                                                                     // если не женский пол)
+            result.textContent = Math.round((88.36 + (13.4 * weight) + (4.8 * height) - (5.7 * age)) * ratio);
+        }
+    }
+
+    calcTotal();
+
+    function getStaticInformation(parentSelector, activeClass) {                      //получение статических данных
+        const elements = document.querySelectorAll(`${parentSelector} div`);          //получаем все div внутри род селектора
+
+        elements.forEach(item => {                                
+            item.addEventListener('click', (e) => {
+                if(e.target.getAttribute('data-ratio')){                              //если элемент события имеет атрибут
+                    ratio = +e.target.getAttribute('data-ratio');                     //записываем значение этого атрибука в переменную ratio
+                } else {
+                    sex = e.target.getAttribute('id');                                //если атрибут id ,записываем его значение 
+                } 
+
+                elements.forEach( (elem) => {                                         //удаляем класс активности у всех элементов массива
+                    elem.classList.remove(activeClass);
+                });
+                console.log(sex, ratio);
+                
+                e.target.classList.add(activeClass);                                  //элементу события класс активности добавляем
+
+                calcTotal();                                                          //вызываем подсчеты при каждом изменении
+
+            });
+        });
+    }
+   
+    getStaticInformation('#gender', 'calculating__choose-item_active');
+    getStaticInformation('.calculating__choose_big', 'calculating__choose-item_active');
+
+    function getDynamicInformation(selector) {                                        //функция по динамическим инпутам
+        const input = document.querySelector(selector);
+
+        input.addEventListener('input', () => {
+            switch(input.getAttribute('id')) {                                        //проверяем кажый инпут на полное совпадение атрибута 
+                case 'height':                                                        //если атрибут heiht
+                    height = +input.value;                                            //то в переменную height запиываем введеное в инпут значение 
+                    break;                                                            //останавливаем итерацию 
+                case 'weight':
+                    weight = +input.value;
+                    break;
+                case 'age': 
+                    age = +input.value;
+                    break;
+            }
+
+            calcTotal();                                                                  //вызываем подсчеты при каждом изменении
+
+        });
+    }
+    getDynamicInformation('#height');
+    getDynamicInformation('#weight');
+    getDynamicInformation('#age');
 }); 
 
 

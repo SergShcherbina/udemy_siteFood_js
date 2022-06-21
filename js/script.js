@@ -456,12 +456,42 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
-    //№97 Calc
+    //№97 №98 Calc
     const result = document.querySelector('.calculating__result span');              //элемент куда записываем результат
 
-    let sex = 'female',
-    height, weight, age,
-    ratio = 1.375;
+    let sex, height, weight, age, ratio;
+
+    if(localStorage.getItem('sex')) {                                                //98 если получаем значения sex из памяти браузера 
+        sex = localStorage.getItem('sex');                                           //98 записываем в переменную
+    } else {                                                                         //98 если данные не записаны в помяти LocalStorage
+        sex = 'female';                                                              //98 по умолчанию ставим эти
+        localStorage.setItem('sex', 'female');                                       //98 и записываем в память
+    }
+
+    if(localStorage.getItem('ratio')) {                                              //98 если получаем значения sex из памяти браузера 
+        ratio = localStorage.getItem('ratio');                                       //98 записываем в переменную
+    } else {                                                                         //98 если данные не записаны в помяти LocalStorage
+        ratio = '1.375';                                                             //98 по умолчанию ставим эти
+        localStorage.setItem('ratio', '1.375');                                      //98 и записываем в память
+    }
+
+    function initLocalStorage(selector, activeClass){                                //98 ф-я по добавлению класса активности элем из localStorage 
+        const elements = document.querySelectorAll(selector);                        
+
+        elements.forEach(elem => {                                                   //98 перебираем массив полученныей по селектору
+            elem.classList.remove(activeClass);                                      //98 у каждго элемента удаляем клас активности
+            if (elem.getAttribute('id') === localStorage.getItem('sex')){            //98 если значение атрибута id == значению в LocalStorage
+                elem.classList.add(activeClass);                                     //98 данному элементу назначаем класс активности
+            }
+            if(elem.getAttribute('data-ratio') === localStorage.getItem('ratio')) {
+                elem.classList.add(activeClass);
+            }
+        });
+    }
+
+    initLocalStorage('#gender div', 'calculating__choose-item_active');
+    initLocalStorage('.calculating__choose_big div', 'calculating__choose-item_active');
+
 
     function calcTotal() {                                                           //занимается подсчетами
         if (!sex || !height || !weight || !age || !ratio) {                          //если хоть одно из полей не заполнено
@@ -478,15 +508,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     calcTotal();
 
-    function getStaticInformation(parentSelector, activeClass) {                      //получение статических данных
-        const elements = document.querySelectorAll(`${parentSelector} div`);          //получаем все div внутри род селектора
+    function getStaticInformation(selector, activeClass) {                            //получение статических данных
+        const elements = document.querySelectorAll(selector);                         //получаем все div внутри род селектора
 
         elements.forEach(item => {                                
             item.addEventListener('click', (e) => {
                 if(e.target.getAttribute('data-ratio')){                              //если элемент события имеет атрибут
                     ratio = +e.target.getAttribute('data-ratio');                     //записываем значение этого атрибука в переменную ratio
+                    localStorage.setItem('ratio', +e.target.getAttribute('data-ratio')) //98 записываем в память браузера значения введенные пользователем
                 } else {
                     sex = e.target.getAttribute('id');                                //если атрибут id ,записываем его значение 
+                    localStorage.setItem('sex', e.target.getAttribute('id'));         //98 записываем в память браузера значения введенные пользователем
                 } 
 
                 elements.forEach( (elem) => {                                         //удаляем класс активности у всех элементов массива
@@ -502,13 +534,20 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
    
-    getStaticInformation('#gender', 'calculating__choose-item_active');
-    getStaticInformation('.calculating__choose_big', 'calculating__choose-item_active');
+    getStaticInformation('#gender div', 'calculating__choose-item_active');
+    getStaticInformation('.calculating__choose_big div', 'calculating__choose-item_active');
 
     function getDynamicInformation(selector) {                                        //функция по динамическим инпутам
         const input = document.querySelector(selector);
 
         input.addEventListener('input', () => {
+
+            if(input.value.match(/\D/g)){                                             //98 если ввели не число
+                input.style.border = '1px solid red';                                 //98 добавляем красную окантовку
+            } else {
+                input.style.border = 'none';
+            }
+
             switch(input.getAttribute('id')) {                                        //проверяем кажый инпут на полное совпадение атрибута 
                 case 'height':                                                        //если атрибут heiht
                     height = +input.value;                                            //то в переменную height запиываем введеное в инпут значение 
@@ -521,7 +560,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     break;
             }
 
-            calcTotal();                                                                  //вызываем подсчеты при каждом изменении
+            calcTotal();                                                               //вызываем подсчеты при каждом изменении
 
         });
     }
@@ -531,3 +570,49 @@ document.addEventListener('DOMContentLoaded', () => {
 }); 
 
 
+
+
+
+/* const promisify = (item, delay) =>
+    new Promise(resolve => setTimeout(() => resolve(item), delay));
+ 
+const a = () => promisify('a', 100);
+const b = () => promisify('b', 5000);
+const c = () => promisify('c', 3000);
+ 
+function one() {
+    const promises = [a(), b(), c()];
+    Promise.all(promises).then(values => console.log(values))
+}
+ 
+one(); */
+/* const promisify = (item, delay) =>
+    new Promise(resolve => setTimeout(() => resolve(item), delay));
+ 
+const a = () => promisify('a', 100);
+const b = () => promisify('b', 5000);
+const c = () => promisify('c', 3000);
+ 
+async function two() {
+    const promises = [a(), b(), c()];
+    const outpu1 = await Promise.race(promises);
+    return `two is done: ${outpu1}`;
+}
+ 
+two().then(console.log); */
+const promisify = (item, delay) =>
+    new Promise(resolve => setTimeout(() => resolve(item), delay));
+ 
+const a = () => promisify('a', 100);
+const b = () => promisify('b', 5000);
+const c = () => promisify('c', 3000);
+ 
+async function three() {
+    const outpu1 = await a();
+    const outpu2 = await b();
+    const outpu3 = await c();
+    return `three is done: ${outpu1} ${outpu2} ${outpu3}`
+}
+ 
+three().then(console.log);
+ 

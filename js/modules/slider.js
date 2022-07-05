@@ -1,26 +1,20 @@
-function slider() {
+import {getZiro} from './timer';
 
-      // Slider --- простой слайдер урок №92 / слайдер с горизонтальной прокруткой №93
-      const slides = document.querySelectorAll('.offer__slide'),
-      slider = document.querySelector('.offer__slider'),                     //94 получаем весь слайдер 
-      currentSlide = document.getElementById('current'),
-      totalSlide = document.getElementById('total'),
-      next = document.querySelector('.offer__slider-next'),
-      prev = document.querySelector('.offer__slider-prev'),
-      slideWrapper = document.querySelector('.offer__slider-wrapper'),
-      slideField = document.querySelector('.offer__slider-inner'),
-      width = window.getComputedStyle(slideWrapper).width;                   //93 получаем ширину переменной slideWrapper из применненных к ней стилей
+function slider({container, slide, nextArrow, prevArrow, totalCounter, currentCounter, wrapper, field}) {
+
+    // Slider --- простой слайдер урок №92 / слайдер с горизонтальной прокруткой №93
+    const slides = document.querySelectorAll(slide ),
+          slider = document.querySelector(container),                     //94 получаем весь слайдер 
+          currentSlide = document.getElementById(currentCounter),
+          totalSlide = document.getElementById(totalCounter ),
+          next = document.querySelector(nextArrow),
+          prev = document.querySelector(prevArrow),
+          slideWrapper = document.querySelector(wrapper),
+          slideField = document.querySelector(field),
+          width = window.getComputedStyle(slideWrapper).width;                   //93 получаем ширину переменной slideWrapper из применненных к ней стилей
 
     let slideIndex = 1;                                                      //93 задаем индекс для текущегослайда
     let offset = 0;                                                          //93 переменная для контроля отступаб так как слайдер горизонтальный
-
-    function getZiro(num) {                                                  //ф-я по добавлению нуля перед цифрой
-        if(num >= 0 && num < 10){                                            //если число из аргумента > 0 и < 10 
-            return `0${num}`;                                                //возвращаем 0 + это число
-        } else {
-            return num;
-        }
-    }
 
     //инициализация слайдера       
     currentSlide.textContent = getZiro(`${slideIndex}`);                     //93 в нумерацию слайдов прописываем индекс и ставим ноль перед цифрой
@@ -128,4 +122,4 @@ function slider() {
 }
 
 
-module.exports = slider;
+export default slider;

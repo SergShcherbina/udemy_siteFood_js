@@ -1,7 +1,10 @@
-function forms() {
+import {closeModal, showModal} from './modal';
+import {postData} from '../services/services';
+
+function forms(formSelector, modalTimerId) {
 
      //Form ///// Fetch API  /////////////////////////                      // -- через Fetch API
-     const forms = document.querySelectorAll('form');
+     const forms = document.querySelectorAll(formSelector);
 
      const messages = {                                                     //создаем обьект с различными сообщениями для пользователя
          loading: 'img/form/spinner.svg',
@@ -12,18 +15,7 @@ function forms() {
      forms.forEach( item => {                                               //перебираем массив с формами
          bindPostData(item);                                                //вызываем функцию postData на каждой форме 
      }); 
- 
-     const postData = async (url, data) => {                                //создаем функцию по общению  с сервером, постинг данных !!!УРОК № 90
-         const res = await fetch(url, {                                     //настраиваем постинг данных json, ответ записываем в переменную res
-             method: 'POST',                                            
-             headers: {
-                 'Content-type': 'application/json'                         //в заголовках между типом ставим : 
-             },
-             body: data   
-         });
-         return await res.json();        //получаем ответ о статусе прохождении постинга в виде промиса => конвертируем в обычный обьект => возвращаем из фунции  
-     };
- 
+
      function bindPostData(form){                                           //фонкия отвечающая за привязку постинга данных на срвер
          form.addEventListener('submit', (e) => {
              e.preventDefault();
@@ -62,7 +54,7 @@ function forms() {
  
          prevModalDiolog.classList.add('hide');                                   //скрываем основную форму с инпутами 
          prevModalDiolog.classList.remove('show');
-         //showModal();
+         showModal('.modal', modalTimerId);
  
          const thanksModal = document.createElement('div');                         
          thanksModal.classList.add('modal__dialog');
@@ -80,10 +72,10 @@ function forms() {
              thanksModal.remove();                                                //удаляем форму благодарности
              prevModalDiolog.classList.remove('hide');                            //восстанавливаем видимость основнойформы
              prevModalDiolog.classList.add('show');
-             closeModal();                                                        //закрываем окно формы
+             closeModal('.modal');                                                        //закрываем окно формы
          }, 4000 );
      }
      
 }
 
-module.exports = forms;
+export default forms;

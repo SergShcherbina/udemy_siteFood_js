@@ -1,3 +1,5 @@
+import {getResours} from "../services/services";
+
 function cards() {
 
     //Card
@@ -39,16 +41,6 @@ function cards() {
             this.parent.append(element);                               //помещаем верстку(element) относительно динамического parent в HTML
         }
     }
-
-    const getResours = async (url) => {                                //создаем функцию по получению данных ссервера !!!УРОК № 90
-        const res = await fetch(url);
-
-        if(!res.ok){                                                         //если статус запроса не окей(не 200)
-           throw new Error(`Could not fetch ${url}, status: ${res.status}`); // выкидывает в консоль ошибку с адресом и статусом ошибки
-        }
-
-        return await res.json();                                       //транформируем данные из json формата в обычный обьект
-    };
 
     /* axios.get('http://localhost:3000/menu')                         //сделать запрос с помощью библиотеки axix, ф-я getResours не нужна !урок 91
         .then(data => {                                                
@@ -94,4 +86,4 @@ function cards() {
 
 }
 
-module.exports = cards; 
+export default cards; 

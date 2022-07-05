@@ -1,9 +1,9 @@
-function tabs() {
+function tabs(tabsSelector, tabsContentSelector, tabsParantSelector, activeClass) {
 
      //Tabs
-    let tabsContent = document.querySelectorAll('.tabcontent'),
-    tabHeader = document.querySelectorAll('.tabheader__item'),
-    tabsParant = document.querySelector('.tabheader__items');
+    let tabs = document.querySelectorAll(tabsSelector),
+        tabsContent = document.querySelectorAll(tabsContentSelector),
+        tabsParant = document.querySelector(tabsParantSelector);
 
     function hideTabContent() {                                    //перебираем цыклом для того чтобы скрыть все табы
         tabsContent.forEach( (item) => {
@@ -11,15 +11,15 @@ function tabs() {
             item.classList.add('hide');                             //присваиваем им класс hide
         });
 
-        tabHeader.forEach( (item) => {
-            item.classList.remove('tabheader__item_active');        //удаляем класс активности
+        tabs.forEach( (item) => {
+            item.classList.remove(activeClass);        //удаляем класс активности
         });
     }
 
     function showTabContent(i = 0) {                                //если не передано никакого аргемента тогда i=0
         tabsContent[i].classList.add('fade');                       //добавляем анимацию fade
         tabsContent[i].classList.remove('hide');                    //удаляем arr[0] класс hide
-        tabHeader[i].classList.add('tabheader__item_active');       //присваиваем arr[0] класс акивности
+        tabs[i].classList.add(activeClass);       //присваиваем arr[0] класс акивности
         
     }
 
@@ -28,8 +28,8 @@ function tabs() {
 
     tabsParant.addEventListener('click', (e) => {                   //вешаем обработчик событий на родителя списка
         
-        if(e.target && e.target.classList.contains('tabheader__item')) {   //проверяем на то что кликнули именно в элемент списка
-            tabHeader.forEach( (item, i) => {                       //перебираем все элементы списка
+        if(e.target && e.target.classList.contains(tabsSelector.slice(1))) {   //проверяем на то что кликнули именно в элемент списка
+            tabs.forEach( (item, i) => {                       //перебираем все элементы списка
 
                 if(e.target == item) {                              //если элемент по которому кликнути и элемент списка совпадают 
                     hideTabContent();                            
@@ -41,4 +41,4 @@ function tabs() {
 
 }
 
-module.exports = tabs;  //экспортируем модуль
+export default tabs;  //экспортируем модуль

@@ -1,9 +1,17 @@
-function timer() {
+function getZiro(num) {                                        //ф-я по добавлению нуля перед цифрой
+    if(num >= 0 && num < 10){                                  //если число из аргумента > 0 и < 10 
+        return `0${num}`;                                      //возвращаем 0 + это число
+    } else {
+        return num;
+    }
+}
+
+function timer(id, deadline  ) {
 
     //Timer
-    const deadline = new Date()  /* '2022-05-30' */;                //время до которого должны дойти
+    //const deadline = new Date()  /* '2022-05-30' */;                //время до которого должны дойти
 
-    deadline.setDate(deadline.getDate() + 1);                       // остается всегда 1 день
+    //deadline.setDate(deadline.getDate() + 1);                       // остается всегда 1 день
 
     function getTimeRemaining(endtime) {
         let days, hours, minutes, seconds;
@@ -31,14 +39,6 @@ function timer() {
         };
     }
 
-    function getZiro(num) {                                        //ф-я по добавлению нуля перед цифрой
-        if(num >= 0 && num < 10){                                  //если число из аргумента > 0 и < 10 
-            return `0${num}`;                                      //возвращаем 0 + это число
-        } else {
-            return num;
-        }
-    }
-
     function setClock(selector, endtime) {
         const timer = document.querySelector(selector),             //получаем все значения 
               days = timer.querySelector('#days'),
@@ -61,8 +61,9 @@ function timer() {
             }
         }
     }
-    setClock('.timer', deadline); 
+    setClock(id, deadline); 
 
 }
 
-module.exports = timer;
+export default timer;
+export {getZiro}; 

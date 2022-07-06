@@ -7,11 +7,11 @@ import  modal from './modules/modal';
 import  slider from './modules/slider';
 import  tabs from './modules/tabs';
 import  timer from './modules/timer';
-import {openModal} from './modules/modal';
+import {showModal} from './modules/modal';
 
 document.addEventListener('DOMContentLoaded', () => {
 
-    const modalTimerId = setTimeout(() => openModal('.modal', modalTimerId), 300000 );                     //модальное окно открывается через заданное время
+    const modalTimerId = setTimeout(() => showModal('.modal', modalTimerId), 300000 );                     //модальное окно открывается через заданное время
 
     calc();
     cards();
